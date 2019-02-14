@@ -201,13 +201,16 @@ void Ball::draw(glm::mat4 VP) {
     glm::mat4 rotate   = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(1, 0, 0));
     glm::mat4 turned    = glm::rotate((float) (this->turn * M_PI / 180.0f), glm::vec3(0, 1, 0));
     glm::mat4 banked    = glm::rotate((float) (this->banking * M_PI / 180.0f), glm::vec3(0, 0, 1));
-    glm::mat4 inclined   = glm::rotate((float) (this->incline * M_PI / 180.0f), glm::vec3(cos((this->turn+90)*M_PI/180.0f),sin((this->turn+90)*M_PI/180.0f), 0));
+    // glm::mat4 inclined   = glm::rotate((float) (this->incline * M_PI / 180.0f), glm::vec3(sin((this->turn+90)*M_PI/180.0f), 0, cos((this->turn+90)*M_PI/180.0f)));
+    glm::mat4 inclined   = glm::rotate((float) (this->incline * M_PI / 180.0f), glm::vec3(1, 0, 0));
 
 
 
     // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
     // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    Matrices.model *= (translate  * rotate * turned * inclined * banked);
+    // Matrices.model *= (translate * turned * rotate * inclined * banked);
+    Matrices.model *= (translate * rotate * turned * banked * inclined);
+
     // Matrices.model *= (translate * rotate);
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -241,27 +244,56 @@ void Ball::down() {
           this->position.z=-1;
         }
       else{
-      this->position.z -= this->downfall;
-    }
+         this->position.z -= this->downfall;
+        }
   }
 }
 
 
 void Ball::right() {
-  this->turn--;
+     this->turn--;
 }
 void Ball::bankright() {
-  this->banking =  30;
-}
+    // this->
+    if(abs(this->banking-45)<=2)
+       this->banking=45;
+    else
+      {
+        if(this->banking>45 && this->banking<225)
+             this->banking-=2;
+         else
+             this->banking+=2;
+      }
+   }
+
 void Ball::left() {
-  this->turn++;
+     this->turn++;
 }
 void Ball::bankleft() {
-  this->banking = -30;
+  if(abs(this->banking-315)<=2)
+     this->banking=315;
+  else
+    {
+    if(this->banking>315 || this->banking<135)
+     this->banking -=2;
+    else
+      this->banking +=2;
+    }
 }
 void Ball::forward() {
     this->position.x += this->speed*sin((180-this->turn) * M_PI / 180.0f);
     this->position.y += this->speed*cos((this->turn-180) * M_PI / 180.0f);
+}
+void Ball::bankcenter() {
+  if(abs(this->banking)<=2 || this->banking >=358)
+     this->banking=0;
+  else
+    {
+    if(this->banking>0 && this->banking<180)
+     this->banking -=2;
+    else
+      this->banking +=2;
+    }
 }
 
 

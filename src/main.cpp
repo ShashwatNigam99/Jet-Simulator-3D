@@ -55,8 +55,8 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     targetz = ball.position.z;
     // eyex = targetx + 15*cos(camera_rotation_angle*M_PI/180.0f);
     // eyey = targety - 15*sin(camera_rotation_angle*M_PI/180.0f);
-    eyex = targetx + 15;
-    eyey = targety - 15;
+    eyex = targetx;
+    eyey = targety-5;
     eyez = targetz + 30;
     break;
 
@@ -67,9 +67,21 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     targetz = ball.position.z;
     // eyex = targetx + 15*cos(camera_rotation_angle*M_PI/180.0f);
     // eyey = targety - 15*sin(camera_rotation_angle*M_PI/180.0f);
-    eyex = -30;
-    eyey = -30;
+    eyex = 1;
+    eyey = 1;
     eyez = 40;
+    break;
+
+    case 4:
+    // camera_rotation_angle = 90;
+    targetx = ball.position.x + 100*sin((180-ball.turn) * M_PI / 180.0f);
+    targety = ball.position.y + 100*cos((ball.turn-180) * M_PI / 180.0f);
+    targetz = ball.position.z;
+    // eyex = targetx + 15*cos(camera_rotation_angle*M_PI/180.0f);
+    // eyey = targety - 15*sin(camera_rotation_angle*M_PI/180.0f);
+    eyex = ball.position.x - 20*sin((180-ball.turn) * M_PI / 180.0f);
+    eyey = ball.position.y - 20*cos((ball.turn-180) * M_PI / 180.0f);
+    eyez = ball.position.z+20;
     break;
   }
 
@@ -122,74 +134,117 @@ void draw() {
 
 void tick_input(GLFWwindow *window) {
 
-    int left  = glfwGetKey(window, GLFW_KEY_LEFT);
-    int right = glfwGetKey(window, GLFW_KEY_RIGHT);
-    int forward = glfwGetKey(window, GLFW_KEY_UP);
+    int left1  = glfwGetKey(window, GLFW_KEY_LEFT);
+    int left2  = glfwGetKey(window, GLFW_KEY_Q);
 
-    int up = glfwGetKey(window, GLFW_KEY_W);
+    int right1 = glfwGetKey(window, GLFW_KEY_RIGHT);
+    int right2 = glfwGetKey(window, GLFW_KEY_E);
+
+    int bankleft  = glfwGetKey(window, GLFW_KEY_A);
+    int bankright = glfwGetKey(window, GLFW_KEY_D);
+
+    int forward1 = glfwGetKey(window, GLFW_KEY_UP);
+    int forward2 = glfwGetKey(window, GLFW_KEY_W);
+
+    int up = glfwGetKey(window, GLFW_KEY_SPACE);
     int down = glfwGetKey(window, GLFW_KEY_S);
 
     int plane_view = glfwGetKey(window, GLFW_KEY_P);
     int top_view =  glfwGetKey(window, GLFW_KEY_T);
     int tower_view =  glfwGetKey(window, GLFW_KEY_Y);
+    int follow_cam_view =  glfwGetKey(window, GLFW_KEY_F);
+
 
     if(plane_view){
       view = 1;
     }
-    if(top_view){
+    else if(top_view){
       view = 2;
     }
-    if(tower_view){
+    else if(tower_view){
       view = 3;
     }
+    else if(follow_cam_view){
+      view = 4;
+    }
 
-    if(right && forward){
+/////////////////////////////
+    if(right1 && forward1 || right2 && forward1 || right1 && forward2 || right2 && forward2 ){
       ball.right();
       ball.forward();
       ball.bankright();
+      cout<<"RIGHT FORWARD!\n";
     }
-    else if(left && forward){
+    else if(left1 && forward1 || left2 && forward1 || left1 && forward2 || left2 && forward2){
       ball.left();
       ball.forward();
       ball.bankleft();
+      cout<<"LEFT FORWARD!\n";
     }
-    else if(right){
+    else if(right1 || right2){
       ball.right();
       // ball.bankright();
       cout<<"RIGHT!\n";
     }
-    else if(left){
+    else if(left1 || left2){
       ball.left();
       // ball.bankleft();
       cout<<"LEFT!\n";
     }
-    else if(forward) {
+    else if( (forward1 || forward2) && bankleft) {
+      ball.forward();
+      ball.banking--;
+    }
+    else if( (forward1 || forward2) && bankright) {
+      ball.forward();
+      ball.banking++;
+    }
+    else if(forward1 || forward2) {
         ball.forward();
         cout<<"FORWARD!\n";
-        ball.banking=0;
+        ball.bankcenter();
+    }
+    else if(bankleft){
+      ball.banking--;
+    }
+    else if(bankright){
+      ball.banking++;
     }
     else{
-      ball.banking=0;
+      ball.bankcenter();
     }
 
 
     if (up){
       cout<<"UP!\n";
       ball.up();// jetpack thrust so put all velocity gained due to falling to zero
-      ball.incline = 30;
+      if(ball.incline >= -30)
+         ball.incline --;
     }
     else if(down){
       cout<<"DOWN!\n";
       ball.down();
-      ball.incline = -30;
+      if(ball.incline <= 30)
+         ball.incline ++;
     }
     else{
-      ball.incline = 0;
+      cout<<"NO INCLINE CHANGE\n";
+      if(ball.incline<2 && ball.incline>-2)
+        ball.incline = 0;
+       if(ball.incline>1)
+        ball.incline--;
+      else if(ball.incline<1)
+        ball.incline++;
     }
 }
 
 void tick_elements() {
     ball.tick();
+    ball.banking = ball.banking % 360;
+    if(ball.banking<0){
+      ball.banking+=360;
+    }
+    cout<<ball.banking<<"\n";
     // camera_rotation_angle += 1;
 }
 
@@ -203,7 +258,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     // ball2       = Ball(-5,0, COLOR_GREEN);
     for(int i=0;i<1000;i++){
        // int p = (rand()%5==0)?1:0;
-            coins.push_back(Coin(-100+rand()%200,-100+rand()%200,COLOR_GREEN,0));
+            coins.push_back(Coin(-200+rand()%400,-200+rand()%400,COLOR_GREEN,0));
     }
     // GLuint seaTextureID = createTexture("../images/sea.jpg");
     sea        = Sea( 0, 0);

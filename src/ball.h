@@ -10,8 +10,8 @@ public:
     glm::vec3 position;
     float rotation;
     float turn;
-    float banking;
-    float incline;
+    int banking;
+  float incline;
     void draw(glm::mat4 VP);
     void set_position(float x, float y);
     void tick();
@@ -22,6 +22,7 @@ public:
     void forward();
     void bankright();
     void bankleft();
+    void bankcenter();
 
     double speed;
     double upthrust;
