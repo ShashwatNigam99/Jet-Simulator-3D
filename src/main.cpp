@@ -24,8 +24,9 @@ vector<Coin> coins;
 
 // Sea sea;
 
-float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
+float screen_zoom = 1.0, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
+bool clk = false;
 
 float eyex,eyey,eyez;
 float targetx,targety,targetz;
@@ -65,11 +66,9 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     targetx = ball.position.x;
     targety = ball.position.y;
     targetz = ball.position.z;
-    // eyex = targetx + 15*cos(camera_rotation_angle*M_PI/180.0f);
-    // eyey = targety - 15*sin(camera_rotation_angle*M_PI/180.0f);
     eyex = 1;
     eyey = 1;
-    eyez = 40;
+    eyez = 30;
     break;
 
     case 4:
@@ -82,6 +81,16 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     eyex = ball.position.x - 20*sin((180-ball.turn) * M_PI / 180.0f);
     eyey = ball.position.y - 20*cos((ball.turn-180) * M_PI / 180.0f);
     eyez = ball.position.z+20;
+    break;
+
+    case 5:
+    // camera_rotation_angle = 90;
+    targetx = ball.position.x ;
+    targety = ball.position.y ;
+    targetz = ball.position.z ;
+
+    mouseuse(window,1000,1000,&eyex,&eyey);
+    eyez=30;
     break;
   }
 
@@ -153,7 +162,7 @@ void tick_input(GLFWwindow *window) {
     int top_view =  glfwGetKey(window, GLFW_KEY_T);
     int tower_view =  glfwGetKey(window, GLFW_KEY_Y);
     int follow_cam_view =  glfwGetKey(window, GLFW_KEY_F);
-
+    int heli_cam_view =  glfwGetKey(window, GLFW_KEY_H);
 
     if(plane_view){
       view = 1;
@@ -166,6 +175,9 @@ void tick_input(GLFWwindow *window) {
     }
     else if(follow_cam_view){
       view = 4;
+    }
+    else if(heli_cam_view){
+      view = 5;
     }
 
 /////////////////////////////
@@ -214,8 +226,8 @@ void tick_input(GLFWwindow *window) {
       ball.bankcenter();
     }
 
-
-    if (up){
+//////////////////////
+    if(up){
       cout<<"UP!\n";
       ball.up();// jetpack thrust so put all velocity gained due to falling to zero
       if(ball.incline >= -30)
@@ -228,7 +240,7 @@ void tick_input(GLFWwindow *window) {
          ball.incline ++;
     }
     else{
-      cout<<"NO INCLINE CHANGE\n";
+      // cout<<"NO INCLINE CHANGE\n";
       if(ball.incline<2 && ball.incline>-2)
         ball.incline = 0;
        if(ball.incline>1)
@@ -244,8 +256,7 @@ void tick_elements() {
     if(ball.banking<0){
       ball.banking+=360;
     }
-    cout<<ball.banking<<"\n";
-    // camera_rotation_angle += 1;
+    // cout<<ball.banking<<"\n";
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -310,6 +321,8 @@ int main(int argc, char **argv) {
 
             tick_elements();
             tick_input(window);
+            reshapeWindow (window, width, height);//added now
+
         }
 
         // Poll for Keyboard and mouse events
@@ -325,11 +338,13 @@ bool detect_collision(bounding_box_t a, bounding_box_t b) {
 }
 
 void reset_screen() {
-    float top    = screen_center_y + 10 / screen_zoom;
-    float bottom = screen_center_y - 10 / screen_zoom;
-    float left   = screen_center_x - 10 / screen_zoom;
-    float right  = screen_center_x + 10 / screen_zoom;
+    // float top    = screen_center_y + 10 / screen_zoom;
+    // float bottom = screen_center_y - 10 / screen_zoom;
+    // float left   = screen_center_x - 10 / screen_zoom;
+    // float right  = screen_center_x + 10 / screen_zoom;
     // Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
-    Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
+    // Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
+    GLfloat fov = screen_zoom;
+    Matrices.projection = glm::perspective(fov, 1.0f, 1.0f, 500.0f);
 
 }

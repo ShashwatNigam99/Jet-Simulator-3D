@@ -33,6 +33,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods);
 void keyboardChar(GLFWwindow *window, unsigned int key);
 void mouseButton(GLFWwindow *window, int button, int action, int mods);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* eye_y);
 
 // other_handlers.cpp
 void error_callback(int error, const char *description);
@@ -74,6 +75,8 @@ struct bounding_box_t {
 bool detect_collision(bounding_box_t a, bounding_box_t b);
 
 extern float screen_zoom, screen_center_x, screen_center_y;
+extern bool clk,pause;
+
 void reset_screen();
 
 // ---- Colors ----
