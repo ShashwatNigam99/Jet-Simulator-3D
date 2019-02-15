@@ -7,7 +7,7 @@
 class Ring {
 public:
     Ring() {}
-    Ring(float x, float y, float z, color_t color);
+    Ring(float x, float y, float z, float rot, color_t color);
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);

@@ -276,7 +276,7 @@ void initGL(GLFWwindow *window, int width, int height) {
     }
     // GLuint seaTextureID = createTexture("../images/sea.jpg");
      sea        = Sea( 0, 0);
-    ring = Ring(10,10,20,COLOR_GREEN);
+    ring = Ring(10,10,20,30,COLOR_GREEN);
 
     	// textureProgramID = LoadShaders( "TextureRender.vert", "TextureRender.frag" );
     	// Matrices.TexMatrixID = glGetUniformLocation(textureProgramID, "MVP");
