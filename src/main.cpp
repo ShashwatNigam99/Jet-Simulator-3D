@@ -3,6 +3,7 @@
 #include "ball.h"
 #include "sea.h"
 #include "coin.h"
+#include "rings.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ Ball ball;
 // Ball ball2;
 Sea sea;
 vector<Coin> coins;
+Ring ring;
 
 
 // Sea sea;
@@ -136,6 +138,7 @@ void draw() {
     ball.draw(VP);
     // ball2.draw(VP);
     sea.draw(VP);
+    ring.draw(VP);
     for(int i=0;i<coins.size();++i){
       coins[i].draw(VP);
     }
@@ -272,7 +275,8 @@ void initGL(GLFWwindow *window, int width, int height) {
             coins.push_back(Coin(-200+rand()%400,-200+rand()%400,COLOR_GREEN,0));
     }
     // GLuint seaTextureID = createTexture("../images/sea.jpg");
-    sea        = Sea( 0, 0);
+     sea        = Sea( 0, 0);
+    ring = Ring(10,10,20,COLOR_GREEN);
 
     	// textureProgramID = LoadShaders( "TextureRender.vert", "TextureRender.frag" );
     	// Matrices.TexMatrixID = glGetUniformLocation(textureProgramID, "MVP");
@@ -343,8 +347,8 @@ void reset_screen() {
     // float left   = screen_center_x - 10 / screen_zoom;
     // float right  = screen_center_x + 10 / screen_zoom;
     // Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
-    // Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
-    GLfloat fov = screen_zoom;
-    Matrices.projection = glm::perspective(fov, 1.0f, 1.0f, 500.0f);
+    Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
+    // GLfloat fov = screen_zoom;
+    // Matrices.projection = glm::perspective(fov, 1.0f, 1.0f, 500.0f);
 
 }

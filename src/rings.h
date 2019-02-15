@@ -1,16 +1,15 @@
 #include "main.h"
 
-#ifndef COIN_H
-#define COIN_H
+#ifndef RING_H
+#define RING_H
 
 
-class Coin {
+class Ring {
 public:
-    Coin() {}
-    Coin(float x, float y, color_t color,int special);
+    Ring() {}
+    Ring(float x, float y, float z, color_t color);
     glm::vec3 position;
     float rotation;
-    int special;
     void draw(glm::mat4 VP);
     void set_position(float x, float y);
 
@@ -21,4 +20,4 @@ private:
     VAO *object;
 };
 
-#endif // COIN_H
+#endif // RING_H
