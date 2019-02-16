@@ -18,22 +18,25 @@ GLuint textureID;
 **************************/
 
 Ball ball;
-// Ball ball2;
 Sea sea;
 vector<Coin> coins;
 Ring ring;
-
-
-// Sea sea;
+vector<Missile> missiles;
+vector<Bomb> bombs;
+vector<Ring> rings;
+vector<Ring> comp_rings;
 
 float screen_zoom = 1.0, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
-bool clk = false;
+bool clk = false,rclk = false;
 
 float eyex,eyey,eyez;
 float targetx,targety,targetz;
 
 int view = 3;
+int MISSILE_TIMER=0;
+int BOMB_TIMER=0;
+
 // view 1 plane view
 // view 2 top view
 // view 3 tower view
@@ -138,9 +141,21 @@ void draw() {
     ball.draw(VP);
     // ball2.draw(VP);
     sea.draw(VP);
-    ring.draw(VP);
+    // ring.draw(VP);
     for(int i=0;i<coins.size();++i){
       coins[i].draw(VP);
+    }
+    for(int i=0;i<missiles.size();++i){
+      missiles[i].draw(VP);
+    }
+    for(int i=0;i<bombs.size();++i){
+      bombs[i].draw(VP);
+    }
+    for(int i=0;i<rings.size();++i){
+      rings[i].draw(VP);
+    }
+    for(int i=0;i<comp_rings.size();++i){
+      comp_rings[i].draw(VP);
     }
 }
 
@@ -157,7 +172,7 @@ void tick_input(GLFWwindow *window) {
 
     int forward1 = glfwGetKey(window, GLFW_KEY_UP);
     int forward2 = glfwGetKey(window, GLFW_KEY_W);
-
+    int backward = glfwGetKey(window, GLFW_KEY_DOWN);
     int up = glfwGetKey(window, GLFW_KEY_SPACE);
     int down = glfwGetKey(window, GLFW_KEY_S);
 
@@ -229,6 +244,10 @@ void tick_input(GLFWwindow *window) {
       ball.bankcenter();
     }
 
+    if(backward){
+      ball.backward();
+    }
+
 //////////////////////
     if(up){
       cout<<"UP!\n";
@@ -251,15 +270,52 @@ void tick_input(GLFWwindow *window) {
       else if(ball.incline<1)
         ball.incline++;
     }
+    /////////////////fire missiles
+    if(clk==true && view!=5 && MISSILE_TIMER<=0){
+       missiles.push_back(Missile(ball.position.x,ball.position.y,ball.position.z,ball.turn,ball.incline));
+       MISSILE_TIMER+=50;
+    }
+    if(rclk==true && view!=5 && BOMB_TIMER<=0){
+       bombs.push_back(Bomb(ball.position.x,ball.position.y,ball.position.z,ball.turn));
+       BOMB_TIMER+=50;
+    }
 }
 
 void tick_elements() {
     ball.tick();
+    // mis.tick();
     ball.banking = ball.banking % 360;
     if(ball.banking<0){
       ball.banking+=360;
     }
-    // cout<<ball.banking<<"\n";
+    if(MISSILE_TIMER>0)
+       MISSILE_TIMER--;
+    for(int i=0;i<missiles.size();++i){
+        if(missiles[i].position.x>(ball.position.x+500) || missiles[i].position.x<(ball.position.x-500)
+        ||  missiles[i].position.y>(ball.position.y+500) || missiles[i].position.y<(ball.position.y-500))
+        missiles.erase(missiles.begin()+i);
+    }
+    cout<<missiles.size()<<" chut \n";
+     for(int i=0;i<missiles.size();++i){
+       missiles[i].tick();
+     }
+     if(BOMB_TIMER>0)
+        BOMB_TIMER--;
+     for(int i=0;i<bombs.size();++i){
+         if(bombs[i].position.z<=0)
+         bombs.erase(bombs.begin()+i);
+     }
+     cout<<bombs.size()<<" boom \n";
+      for(int i=0;i<bombs.size();++i){
+        bombs[i].tick();
+      }
+  for(int i=0;i<rings.size();i++){
+    if(detect_passthrough(rings[i].position.x,rings[i].position.y,rings[i].position.z,rings[i].rotation)){
+      cout<<"whoah";
+      rings.erase(rings.begin()+i);
+      comp_rings.push_back(Ring(10,10,20,30,COLOR_GREEN));
+    }
+  }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -271,12 +327,12 @@ void initGL(GLFWwindow *window, int width, int height) {
     ball       = Ball(0, 0, COLOR_RED);
     // ball2       = Ball(-5,0, COLOR_GREEN);
     for(int i=0;i<1000;i++){
-       // int p = (rand()%5==0)?1:0;
             coins.push_back(Coin(-200+rand()%400,-200+rand()%400,COLOR_GREEN,0));
     }
     // GLuint seaTextureID = createTexture("../images/sea.jpg");
      sea        = Sea( 0, 0);
-    ring = Ring(10,10,20,30,COLOR_GREEN);
+     rings.push_back(Ring(10,10,20,30,COLOR_SKYBLUE));
+     // mis   =  Missile(20,30,30);
 
     	// textureProgramID = LoadShaders( "TextureRender.vert", "TextureRender.frag" );
     	// Matrices.TexMatrixID = glGetUniformLocation(textureProgramID, "MVP");
@@ -340,13 +396,12 @@ bool detect_collision(bounding_box_t a, bounding_box_t b) {
     return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
            (abs(a.y - b.y) * 2 < (a.height + b.height));
 }
+bool detect_passthrough(float x,float y,float z,float rot) {
+  return ( (pow((ball.position.x - x),2)+pow((ball.position.y - y),2)+pow((ball.position.z - z),2)) < 64 );
+}
 
 void reset_screen() {
-    // float top    = screen_center_y + 10 / screen_zoom;
-    // float bottom = screen_center_y - 10 / screen_zoom;
-    // float left   = screen_center_x - 10 / screen_zoom;
-    // float right  = screen_center_x + 10 / screen_zoom;
-    // Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
+
     Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
     // GLfloat fov = screen_zoom;
     // Matrices.projection = glm::perspective(fov, 1.0f, 1.0f, 500.0f);

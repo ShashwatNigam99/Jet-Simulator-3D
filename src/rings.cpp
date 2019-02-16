@@ -37,7 +37,7 @@ Ring::Ring(float x, float y,float z, float rot, color_t color) {
       vertex_buffer_data[iter*i+16]=0;
       vertex_buffer_data[iter*i+17]=(r1*sin((i+1)*2*M_PI/p));
 
-      // face 1
+      // face 2
       vertex_buffer_data[iter*i+18]=(r1*cos(i*2*M_PI/p));
       vertex_buffer_data[iter*i+19]=w;
       vertex_buffer_data[iter*i+20]=(r1*sin(i*2*M_PI/p));

@@ -66,19 +66,23 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
     switch (button) {
     case GLFW_MOUSE_BUTTON_LEFT:
         if (action == GLFW_PRESS) {
-            // Do something
             clk = true;
             return;
         } else if (action == GLFW_RELEASE) {
           clk = false;
-            // Do something
+          return;
         }
         break;
-    // case GLFW_MOUSE_BUTTON_RIGHT:
-    // if (action == GLFW_RELEASE) {
-    // rectangle_rot_dir *= -1;
-    // }
-    // break;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+          if (action == GLFW_PRESS) {
+             rclk = true;
+             return;
+          }
+          else if (action == GLFW_RELEASE) {
+            rclk = false;
+            return;
+          }
+          break;
     default:
         break;
     }

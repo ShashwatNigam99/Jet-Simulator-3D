@@ -8,7 +8,7 @@ Ball::Ball(float x, float y, color_t color) {
     this->banking = 0;
     this->incline = 0;
 
-    this->speed = 0.5;
+    this->speed = 0;
     this->upthrust = 0.05;//due to key press
     this->downfall = 0.1;//due to key press
 
@@ -224,14 +224,8 @@ void Ball::set_position(float x, float y) {
 }
 
 void Ball::tick() {
-  // if(this->position.x< screen_center_x+(4.0/screen_zoom))
-  //     this->position.x += this->default_speed_x;
-  //
-  // if(player_max_x<this->position.x){
-  //   player_max_x = this->position.x;
-  // }
-  // std::cout<<"max x "<<player_max_x<<"\n";
-  //  std::cout<<this->position.x<<","<<this->position.y<<"\n";
+  this->position.x += this->speed*sin((180-this->turn) * M_PI / 180.0f);
+  this->position.y += this->speed*cos((this->turn-180) * M_PI / 180.0f);
 }
 void Ball::up() {
     this->position.z += this->upthrust;
@@ -254,7 +248,6 @@ void Ball::right() {
      this->turn--;
 }
 void Ball::bankright() {
-    // this->
     if(abs(this->banking-45)<=2)
        this->banking=45;
     else
@@ -281,8 +274,14 @@ void Ball::bankleft() {
     }
 }
 void Ball::forward() {
-    this->position.x += this->speed*sin((180-this->turn) * M_PI / 180.0f);
-    this->position.y += this->speed*cos((this->turn-180) * M_PI / 180.0f);
+   if(this->speed<=0.5)
+     this->speed+=0.05;
+}
+void Ball::backward() {
+    if(this->speed>0)
+      this->speed-=0.05;
+    if(this->speed<0)
+      this->speed = 0;
 }
 void Ball::bankcenter() {
   if(abs(this->banking)<=2 || this->banking >=358)
@@ -296,20 +295,248 @@ void Ball::bankcenter() {
     }
 }
 
+/////////////////////////////////////////////// missiles
+Missile::Missile(float x, float y,float z,float rot,float incline) {
+    this->position = glm::vec3(x, y, z);
+    this->rotation = rot+180;
+    this->revolve = 0;
+    this->incline = incline;
 
-// void Ball::gravity_fall(){
-//   if(this->position.z>-3){
-//     this->speed_y+=this->gravity;
-//     if(this->position.y-this->speed_y<-3)
-//       {
-//         this->position.y=-3;
-//         this->speed_y=0;
-//       }
-//     else{
-//     this->position.y -= this->speed_y;
-//     }
-//   }
-//   else{
-//     this->speed_y=0;//reached ground
-//   }
-// }
+    const int speed = 1;
+    this->speedx = speed * sin((180-rot)*M_PI/180.0f);
+    this->speedy = speed * cos((180-rot)*M_PI/180.0f);
+    this->speedz = speed * sin(incline*M_PI/180.0f);
+
+    const int p = 60;
+    const int iter = 18;
+    const float r1 = 0.3;
+    const float r2 = 0.15;
+    const float w = 1.5;
+    const int iter2 = 9;
+    const float h = 0.8;
+
+    static GLfloat vertex_buffer_data[iter*p];
+    for (int i=0;i<p;++i){
+      // face 1
+      vertex_buffer_data[iter*i]=(r1*cos(i*2*M_PI/p));
+      vertex_buffer_data[iter*i+1]=-w/2;
+      vertex_buffer_data[iter*i+2]=(r1*sin(i*2*M_PI/p));
+
+      vertex_buffer_data[iter*i+3]=(r1*cos((i+1)*2*M_PI/p));
+      vertex_buffer_data[iter*i+4]=-w/2;
+      vertex_buffer_data[iter*i+5]=(r1*sin((i+1)*2*M_PI/p));
+
+      vertex_buffer_data[iter*i+6]=r2*cos(i*2*M_PI/p);
+      vertex_buffer_data[iter*i+7]=w/2;
+      vertex_buffer_data[iter*i+8]=r2*sin(i*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+9]=r2*cos((i+1)*2*M_PI/p);
+      vertex_buffer_data[iter*i+10]=w/2;
+      vertex_buffer_data[iter*i+11]=r2*sin((i+1)*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+12]=r2*cos(i*2*M_PI/p);
+      vertex_buffer_data[iter*i+13]=w/2;
+      vertex_buffer_data[iter*i+14]=r2*sin(i*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+15]=(r1*cos((i+1)*2*M_PI/p));
+      vertex_buffer_data[iter*i+16]=-w/2;
+      vertex_buffer_data[iter*i+17]=(r1*sin((i+1)*2*M_PI/p));
+
+     }
+
+     static GLfloat vertex_buffer_data_structure[iter2*p+9*2];
+     for (int i=0;i<p;++i){
+     vertex_buffer_data_structure[iter2*i]=r2*cos((i+1)*2*M_PI/p);
+     vertex_buffer_data_structure[iter2*i+1]=w/2;
+     vertex_buffer_data_structure[iter2*i+2]=r2*sin((i+1)*2*M_PI/p);
+
+     vertex_buffer_data_structure[iter2*i+3]=r2*cos(i*2*M_PI/p);
+     vertex_buffer_data_structure[iter2*i+4]=w/2;
+     vertex_buffer_data_structure[iter2*i+5]=r2*sin(i*2*M_PI/p);
+
+     vertex_buffer_data_structure[iter2*i+6]=0;
+     vertex_buffer_data_structure[iter2*i+7]=(w/2)+0.5;
+     vertex_buffer_data_structure[iter2*i+8]=0;
+    }
+      vertex_buffer_data_structure[iter2*p] = 0;
+      vertex_buffer_data_structure[iter2*p+1] = 0;
+      vertex_buffer_data_structure[iter2*p+2] = 0;
+
+      vertex_buffer_data_structure[iter2*p+3] = 0;
+      vertex_buffer_data_structure[iter2*p+4] = -w/2;
+      vertex_buffer_data_structure[iter2*p+5] = 0.8;
+
+      vertex_buffer_data_structure[iter2*p+6] = 0;
+      vertex_buffer_data_structure[iter2*p+7] = -w/2;
+      vertex_buffer_data_structure[iter2*p+8] = -0.8;
+  //
+      vertex_buffer_data_structure[iter2*p+9] = 0;
+      vertex_buffer_data_structure[iter2*p+10] = 0;
+      vertex_buffer_data_structure[iter2*p+11] = 0;
+
+      vertex_buffer_data_structure[iter2*p+12] = 0.8;
+      vertex_buffer_data_structure[iter2*p+13] = -w/2;
+      vertex_buffer_data_structure[iter2*p+14] = 0;
+
+      vertex_buffer_data_structure[iter2*p+15] = -0.8;
+      vertex_buffer_data_structure[iter2*p+16] = -w/2;
+      vertex_buffer_data_structure[iter2*p+17] = 0;
+
+    this->object = create3DObject(GL_TRIANGLES, (iter/3)*p, vertex_buffer_data, COLOR_GOLD, GL_FILL);
+    this->structure = create3DObject(GL_TRIANGLES, (iter2/3)*p+6, vertex_buffer_data_structure, COLOR_RUBY, GL_FILL);
+
+}
+
+void Missile::draw(glm::mat4 VP) {
+    Matrices.model = glm::mat4(1.0f);
+    glm::mat4 translate = glm::translate (this->position);    // glTranslatef
+    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(0, 0, 1));
+    glm::mat4 revolve    = glm::rotate((float) (this->revolve * M_PI / 180.0f), glm::vec3(0, 1, 0));
+
+
+    Matrices.model *= (translate * rotate * revolve);
+    glm::mat4 MVP = VP * Matrices.model;
+    glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    draw3DObject(this->object);
+    draw3DObject(this->structure);
+
+}
+
+void Missile::set_position(float x, float y) {
+    this->position = glm::vec3(x, y, 0);
+}
+
+void Missile::tick() {
+    this->revolve += 3;
+    this->position.x += this->speedx;
+    this->position.y += this->speedy;
+    this->position.z -= this->speedz;
+    // this->speedz += 0.001;//gravity
+
+}
+
+bounding_box_t Missile::return_box(){
+  bounding_box_t coin_bb;
+  coin_bb.x = this->position.x;
+  coin_bb.y = this->position.y;
+  coin_bb.width = 0.4f;
+  coin_bb.height = 0.4f;
+  return coin_bb;
+}
+
+
+//////////////////////////////// bombs
+Bomb::Bomb(float x, float y,float z,float rot) {
+    this->position = glm::vec3(x, y, z-1);
+    this->speedz = 0;
+    this->rotation = 180+rot;
+    this->revolve = 0;
+
+
+    const int p = 60;
+    const int iter = 18;
+    const float r1 = 0.4;
+    const float r2 = 0.3;
+    const float w = 2;
+    const int iter2 = 9;
+    const float h = 1;
+
+    static GLfloat vertex_buffer_data[iter*p];
+    for (int i=0;i<p;++i){
+      // face 1
+      vertex_buffer_data[iter*i]=(r1*cos(i*2*M_PI/p));
+      vertex_buffer_data[iter*i+1]=-w/2;
+      vertex_buffer_data[iter*i+2]=(r1*sin(i*2*M_PI/p));
+
+      vertex_buffer_data[iter*i+3]=(r1*cos((i+1)*2*M_PI/p));
+      vertex_buffer_data[iter*i+4]=-w/2;
+      vertex_buffer_data[iter*i+5]=(r1*sin((i+1)*2*M_PI/p));
+
+      vertex_buffer_data[iter*i+6]=r2*cos(i*2*M_PI/p);
+      vertex_buffer_data[iter*i+7]=w/2;
+      vertex_buffer_data[iter*i+8]=r2*sin(i*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+9]=r2*cos((i+1)*2*M_PI/p);
+      vertex_buffer_data[iter*i+10]=w/2;
+      vertex_buffer_data[iter*i+11]=r2*sin((i+1)*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+12]=r2*cos(i*2*M_PI/p);
+      vertex_buffer_data[iter*i+13]=w/2;
+      vertex_buffer_data[iter*i+14]=r2*sin(i*2*M_PI/p);
+
+      vertex_buffer_data[iter*i+15]=(r1*cos((i+1)*2*M_PI/p));
+      vertex_buffer_data[iter*i+16]=-w/2;
+      vertex_buffer_data[iter*i+17]=(r1*sin((i+1)*2*M_PI/p));
+
+     }
+
+     static GLfloat vertex_buffer_data_structure[iter2*p+9*2];
+     for (int i=0;i<p;++i){
+     vertex_buffer_data_structure[iter2*i]=r2*cos((i+1)*2*M_PI/p);
+     vertex_buffer_data_structure[iter2*i+1]=w/2;
+     vertex_buffer_data_structure[iter2*i+2]=r2*sin((i+1)*2*M_PI/p);
+
+     vertex_buffer_data_structure[iter2*i+3]=r2*cos(i*2*M_PI/p);
+     vertex_buffer_data_structure[iter2*i+4]=w/2;
+     vertex_buffer_data_structure[iter2*i+5]=r2*sin(i*2*M_PI/p);
+
+     vertex_buffer_data_structure[iter2*i+6]=0;
+     vertex_buffer_data_structure[iter2*i+7]=(w/2)+0.5;
+     vertex_buffer_data_structure[iter2*i+8]=0;
+    }
+      vertex_buffer_data_structure[iter2*p] = 0;
+      vertex_buffer_data_structure[iter2*p+1] = 0;
+      vertex_buffer_data_structure[iter2*p+2] = 0;
+
+      vertex_buffer_data_structure[iter2*p+3] = 0;
+      vertex_buffer_data_structure[iter2*p+4] = -w/2;
+      vertex_buffer_data_structure[iter2*p+5] = h;
+
+      vertex_buffer_data_structure[iter2*p+6] = 0;
+      vertex_buffer_data_structure[iter2*p+7] = -w/2;
+      vertex_buffer_data_structure[iter2*p+8] = -h;
+  //
+      vertex_buffer_data_structure[iter2*p+9] = 0;
+      vertex_buffer_data_structure[iter2*p+10] = 0;
+      vertex_buffer_data_structure[iter2*p+11] = 0;
+
+      vertex_buffer_data_structure[iter2*p+12] = h;
+      vertex_buffer_data_structure[iter2*p+13] = -w/2;
+      vertex_buffer_data_structure[iter2*p+14] = 0;
+
+      vertex_buffer_data_structure[iter2*p+15] = -h;
+      vertex_buffer_data_structure[iter2*p+16] = -w/2;
+      vertex_buffer_data_structure[iter2*p+17] = 0;
+
+    this->object = create3DObject(GL_TRIANGLES, (iter/3)*p, vertex_buffer_data, COLOR_SKYBLUE, GL_FILL);
+    this->structure = create3DObject(GL_TRIANGLES, (iter2/3)*p+6, vertex_buffer_data_structure, COLOR_BROWN, GL_FILL);
+
+}
+
+void Bomb::draw(glm::mat4 VP) {
+    Matrices.model = glm::mat4(1.0f);
+    glm::mat4 translate = glm::translate (this->position);    // glTranslatef
+    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(0, 0, 1));
+    glm::mat4 revolve    = glm::rotate((float) (this->revolve * M_PI / 180.0f), glm::vec3(0, 1, 0));
+
+    Matrices.model *= (translate*rotate*revolve);
+    glm::mat4 MVP = VP * Matrices.model;
+    glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    draw3DObject(this->object);
+    draw3DObject(this->structure);
+}
+
+void Bomb::tick() {
+    this->revolve +=2;
+    this->position.z -= this->speedz;
+    this->speedz += 0.01;//gravity
+}
+
+bounding_box_t Bomb::return_box(){
+  bounding_box_t coin_bb;
+  coin_bb.x = this->position.x;
+  coin_bb.y = this->position.y;
+  coin_bb.width = 0.4f;
+  coin_bb.height = 0.4f;
+  return coin_bb;
+}
