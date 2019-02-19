@@ -7,18 +7,26 @@
 class Arrow {
 public:
     Arrow() {}
-    Arrow(float x, float y, color_t color,int special);
+    Arrow(float x, float y, float z);
     glm::vec3 position;
     float rotation;
-    int special;
     void draw(glm::mat4 VP);
-    void set_position(float x, float y);
-
+    void set_position(float x, float y, float z);
     void tick();
-    bounding_box_t return_box();
+  private:
+    VAO *object;
+};
 
+class Volcano {
+public:
+    Volcano() {}
+    Volcano(float x, float y , float h);
+    glm::vec3 position;
+    float height;
+    void draw(glm::mat4 VP);
 private:
     VAO *object;
+    VAO *top;
 };
 
 #endif // ARROW_H

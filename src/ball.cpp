@@ -9,7 +9,7 @@ Ball::Ball(float x, float y, color_t color) {
     this->incline = 0;
 
     this->speed = 0;
-    this->upthrust = 0.05;//due to key press
+    this->upthrust = 0.1;//due to key press
     this->downfall = 0.1;//due to key press
 
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
@@ -224,18 +224,21 @@ void Ball::set_position(float x, float y) {
 }
 
 void Ball::tick() {
+  if(this->position.x<MAX_X && this->position.y<MAX_Y && this->position.x>MIN_X && this->position.y>MIN_Y  ){
   this->position.x += this->speed*sin((180-this->turn) * M_PI / 180.0f);
   this->position.y += this->speed*cos((this->turn-180) * M_PI / 180.0f);
+   }
 }
 void Ball::up() {
+  if(this->position.z<MAX_ALTITUDE)
     this->position.z += this->upthrust;
   }
 
 void Ball::down() {
-  if(this->position.z>-1){
-      if(this->position.z-this->downfall<-1)
+  if(this->position.z>=0.5){
+      if(this->position.z-this->downfall<0.5)
         {
-          this->position.z=-1;
+          this->position.z=0.5;
         }
       else{
          this->position.z -= this->downfall;
@@ -274,12 +277,12 @@ void Ball::bankleft() {
     }
 }
 void Ball::forward() {
-   if(this->speed<=0.5)
-     this->speed+=0.05;
+   if(this->speed<=0.6)
+     this->speed+=0.01;
 }
 void Ball::backward() {
     if(this->speed>0)
-      this->speed-=0.05;
+      this->speed-=0.01;
     if(this->speed<0)
       this->speed = 0;
 }

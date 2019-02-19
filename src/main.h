@@ -73,16 +73,28 @@ struct bounding_box_t {
 };
 
 bool detect_collision(bounding_box_t a, bounding_box_t b);
-bool detect_passthrough(float x,float y,float z,float rot);
+bool detect_passthrough(float x,float y,float z);
+bool detect_para_shoot(float a,float b,float c ,float x,float y,float z);
+bool detect_volcano(float a,float b,float c ,float x,float y,float z);
+bool detect_islands(float a,float b,float c ,float x,float y,float z);
+bool detect_fuelup(float a,float b,float c ,float x,float y,float z);
+bool detect_vicinity(float a,float b,float x,float y);
+bool detect_cannon(float a,float b,float c,float x,float y);
+
+
+
+
 
 extern float screen_zoom, screen_center_x, screen_center_y;
 extern bool clk,rclk,pause;
+extern float MAX_X,MAX_Y,MIN_X,MIN_Y,MAX_ALTITUDE;
 
 void reset_screen();
 
 // ---- Colors ----
 extern const color_t COLOR_RED;
 extern const color_t COLOR_GREEN;
+extern const color_t COLOR_LAWNGREEN;
 extern const color_t COLOR_BLACK;
 extern const color_t COLOR_BACKGROUND;
 extern const color_t COLOR_BLUE;
@@ -97,6 +109,7 @@ extern const color_t COLOR_WHITE;
 extern const color_t COLOR_PURPLE;
 extern const color_t COLOR_PINK;
 extern const color_t COLOR_GRAY;
+extern const color_t COLOR_SAND;
 
 
 #endif
