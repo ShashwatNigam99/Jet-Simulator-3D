@@ -16,11 +16,6 @@ GLuint     programID;
 GLFWwindow *window;
 GLuint textureID;
 
-
-/**************************
-* Customizable functions *
-**************************/
-
 Ball ball;
 Sea sea;
 vector<Coin> coins;
@@ -125,18 +120,12 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     targety = ball.position.y ;
     targetz = ball.position.z ;
     mouseuse(window,1000,1000,&eyex,&eyey,&eyez,targetx,targety,targetz);
-    // eyez=30;
     break;
   }
-
 }
-
-
 
 Timer t60(1.0 / 60);
 
-/* Render the scene with openGL */
-/* Edit this function according to your assignment */
 void draw() {
     // clear the color and depth in the frame buffer
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -266,35 +255,35 @@ void tick_input(GLFWwindow *window) {
       ball.right();
       ball.forward();
       ball.bankright();
-      cout<<"RIGHT FORWARD!\n";
+      // <<"RIGHT FORWARD!\n";
     }
     else if(left1 && forward1 || left2 && forward1 || left1 && forward2 || left2 && forward2){
       ball.left();
       ball.forward();
       ball.bankleft();
-      cout<<"LEFT FORWARD!\n";
+      // <<"LEFT FORWARD!\n";
     }
     if(right1 && backward || right2 && backward ){
       ball.right();
       ball.backward();
       ball.bankright();
-      cout<<"RIGHT backward!\n";
+      // <<"RIGHT backward!\n";
     }
     else if(left1 && backward || left2 && backward ){
       ball.left();
       ball.backward();
       ball.bankleft();
-      cout<<"LEFT FORWARD!\n";
+      // <<"LEFT FORWARD!\n";
     }
     else if(right1 || right2){
       ball.right();
       ball.bankright();
-      cout<<"RIGHT!\n";
+      // <<"RIGHT!\n";
     }
     else if(left1 || left2){
       ball.left();
       ball.bankleft();
-      cout<<"LEFT!\n";
+      // cout<<"LEFT!\n";
     }
     else if( (forward1 || forward2) && bankleft) {
       ball.forward();
@@ -306,7 +295,7 @@ void tick_input(GLFWwindow *window) {
     }
     else if(forward1 || forward2) {
         ball.forward();
-        cout<<"FORWARD!\n";
+        // cout<<"FORWARD!\n";
         ball.bankcenter();
     }
     else if(backward && bankleft) {
@@ -319,7 +308,7 @@ void tick_input(GLFWwindow *window) {
     }
     else if(backward) {
         ball.backward();
-        cout<<"backward!\n";
+        // cout<<"backward!\n";
         ball.bankcenter();
     }
     else if(bankleft){
@@ -334,13 +323,13 @@ void tick_input(GLFWwindow *window) {
 
 //////////////////////
     if(up){
-      cout<<"UP!\n";
+      // cout<<"UP!\n";
       ball.up();
       if(ball.incline >= -30)
          ball.incline --;
     }
     else if(down){
-      cout<<"DOWN!\n";
+      // cout<<"DOWN!\n";
       ball.down();
       if(ball.incline <= 30)
          ball.incline ++;
@@ -361,10 +350,6 @@ void tick_input(GLFWwindow *window) {
     if(clk==true && view!=5 && MISSILE_TIMER<=0){
        missiles.push_back(Missile(ball.position.x,ball.position.y,ball.position.z,ball.turn,ball.incline));
        MISSILE_TIMER+=50;
-       pthread_t missile_sound;
-       cout<<"popat";
-       char missile_filename[] = "fireball_shoot.mp3";
-       pthread_create(&missile_sound,NULL,play_audio,(void*)missile_filename);
     }
     if(rclk==true && view!=5 && BOMB_TIMER<=0){
        bombs.push_back(Bomb(ball.position.x,ball.position.y,ball.position.z,ball.turn));
@@ -381,7 +366,10 @@ void tick_elements() {
 
             fuel -=0.01;
             fuel_meter.set_fuel(fuel);
-
+            if(fuel<=3){
+               cout<<"OUT OF FUEL\n";
+               exit(0);
+            }
             ball.tick();
             if(ball.position.z<0.1){
               cout<<"Crashed\n";
@@ -418,7 +406,7 @@ void tick_elements() {
                cannons[t].tick();
                if(detect_vicinity(ball.position.x,ball.position.y,cannons[t].position.x,cannons[t].position.y) && ATTACK_TIMER<=0)
                  {
-                   cout<<"firing!\n";
+                   cout<<"Cannon firing!\n";
                    bullets.push_back(Bullet(ball.position.x,ball.position.y,ball.position.z,cannons[t].position.x,cannons[t].position.y));
                    ATTACK_TIMER+=50;
                  }
@@ -443,7 +431,7 @@ void tick_elements() {
                   for(int t=0;t<parachutes.size();++t){
                       if(detect_para_shoot(missiles[i].position.x,missiles[i].position.y,missiles[i].position.z,
                         parachutes[t].position.x,parachutes[t].position.y,parachutes[t].position.z)){
-                          cout<<"maaar sale ko\n";
+                          // cout<<"maaar sale ko\n";
                           missiles.erase(missiles.begin()+i);
                           parachutes.erase(parachutes.begin()+t);
                           score+=1234;
@@ -485,7 +473,7 @@ void tick_elements() {
              }
               /////////////////Rings passing through
             if(detect_passthrough(rings[0].position.x,rings[0].position.y,rings[0].position.z)){
-              cout<<"whoah";
+              cout<<"PASSED CHECKPOINT\n";
               comp_rings.push_back(Ring(rings[0].position.x,rings[0].position.y,rings[0].position.z,rings[0].rotation,COLOR_LAWNGREEN));
               rings.erase(rings.begin());
               score+=2000;
@@ -493,7 +481,7 @@ void tick_elements() {
 
            for(int i=0;i<smoke_rings.size();++i){
             if(detect_passthrough(smoke_rings[i].position.x,smoke_rings[i].position.y,smoke_rings[i].position.z)){
-              cout<<"whoah";
+              cout<<"Passed smokering\n";
               // comp_rings.push_back(Ring(rings[0].position.x,rings[0].position.y,rings[0].position.z,rings[0].rotation,COLOR_LAWNGREEN));
               smoke_rings.erase(smoke_rings.begin()+i);
               score+=1000;
@@ -504,7 +492,6 @@ void tick_elements() {
             {
               if(detect_volcano(ball.position.x,ball.position.y,ball.position.z,volcanoes[i].position.x,volcanoes[i].position.y,volcanoes[i].height))
               {
-                cout<<"OH FUCK BITCH";
                 exit(0);
               }
             }
@@ -513,7 +500,6 @@ void tick_elements() {
             {
               if(detect_islands(ball.position.x,ball.position.y,ball.position.z,lands[i].position.x,lands[i].position.y,lands[i].height))
               {
-                cout<<"OH FUCK dekh ke";
                 exit(0);
               }
             }
@@ -522,7 +508,6 @@ void tick_elements() {
             {
               if(detect_fuelup(ball.position.x,ball.position.y,ball.position.z,fuelups[i].position.x,fuelups[i].position.y,fuelups[i].position.z))
               {
-                cout<<"OH noice";
                 fuelups.erase(fuelups.begin()+i);
                 fuel = 100;
               }
@@ -539,24 +524,17 @@ void tick_elements() {
             {
               if(detect_bullet(bullets[i].position.x,bullets[i].position.y,bullets[i].position.z))
               {
-                // cannons.erase(cannons.begin()+i);
-                cout<<"mar gya bc";
                 exit(0);
               }
             }
 
-            // cout<<parachutes.size()<<" number of parcahutes\n";
       }
 
-/* Initialize the OpenGL rendering properties */
-/* Add all the models to be created here */
 void initGL(GLFWwindow *window, int width, int height) {
-    /* Objects should be created before any other gl function and shaders */
     ball       = Ball(0, 0, COLOR_RED);
     for(int i=0;i<2500;i++){
             coins.push_back(Coin(-1000+rand()%2000,-1000+rand()%2000,COLOR_LAWNGREEN,0));
     }
-    // GLuint seaTextureID = createTexture("../images/sea.jpg");
      sea        = Sea( 0, 0);
 
      arrow.push_back(Arrow(0,100,35));
@@ -604,10 +582,6 @@ void initGL(GLFWwindow *window, int width, int height) {
      cannons.push_back(Cannon(355,210));
      cannons.push_back(Cannon(503,355));
      cannons.push_back(Cannon(345,495));
-     //
-     // for(int i=0;i<30;i++){
-     //   fuelups.push_back(Fuelup(-850+rand()%1700, -850+rand()%1700, 20 + rand()% 40));
-     // }
 
      for(float i = -1000.0;i<1000.0; i+=250.0){
         for(float j = -1000.0;j<1000.0; j+=250.0){
@@ -634,15 +608,12 @@ void initGL(GLFWwindow *window, int width, int height) {
      needle = Needle(screen_center_x,3.5);
 
 
-    // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
-    // Get a handle for our "MVP" uniform
     Matrices.MatrixID = glGetUniformLocation(programID, "MVP");
 
 
     reshapeWindow (window, width, height);
 
-    // Background color of the scene
     glClearColor (COLOR_BACKGROUND.r / 256.0, COLOR_BACKGROUND.g / 256.0, COLOR_BACKGROUND.b / 256.0, 0.0f); // R, G, B, A
     glClearDepth (1.0f);
 
@@ -699,23 +670,18 @@ bool detect_passthrough(float x,float y,float z) {
 bool detect_para_shoot(float a,float b,float c ,float x,float y,float z) {
   return ( (pow((a - x),2)+pow((b - y),2)+pow((c - z),2)) < 64 );
 }
-
 bool detect_volcano(float a,float b,float c ,float x,float y,float h){
-  // cout<<" volc"<<( ( pow(a-x,2) + pow(b-y,2)) < 400 && c < (h+40) )<<"volcano";
   return ( ( pow(a-x,2) + pow(b-y,2)) < 400 && c < (h+40) );
 }
-
 bool detect_islands(float a,float b,float c ,float x,float y,float h){
   return ( ( pow(a-x,2) + pow(b-y,2)) < 200 && c < h );
 }
 bool detect_fuelup(float a,float b,float c ,float x,float y,float z){
-  // cout<<"detect"<<( abs(a-x)<2.5 && abs(b-y)<2.5 && abs(c-z)<3)<<"\n";
   return ( abs(a-x)<2.5 && abs(b-y)<2.5 && abs(c-z)<3) ;
 }
 bool detect_vicinity(float a,float b,float x,float y){
   return ( ( pow(a-x,2) + pow(b-y,2)) < 1500  );
 }
-// a b c --plane and x y -- cannon
 bool detect_cannon(float a,float b, float c,float x,float y){
   return  ( pow(a-x,2) + pow(b-y,2) < 40 && c<10 );
 }
@@ -727,8 +693,6 @@ bool detect_bullet(float x,float y,float z){
 void reset_screen() {
 
     Matrices.projection = glm::perspective(glm::radians(90.0), 1.0, 1.0, 500.0);
-    // GLfloat fov = screen_zoom;
-    // Matrices.projection = glm::perspective(fov, 1.0f, 1.0f, 500.0f);
     float top    = screen_center_y + (4 / screen_zoom);
     float bottom = screen_center_y - (4 / screen_zoom);
     float left   = screen_center_x - (4 / screen_zoom);

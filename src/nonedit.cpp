@@ -15,14 +15,11 @@
 
 using namespace std;
 
-/* Initialise glfw window, I/O callbacks and the renderer to use */
-/* Nothing to Edit here */
 GLFWwindow*initGLFW(int width, int height) {
     GLFWwindow *window; // window desciptor/handle
 
     glfwSetErrorCallback(error_callback);
     if (!glfwInit()) {
-        // exit(EXIT_FAILURE);
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,                 3);

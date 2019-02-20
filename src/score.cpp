@@ -374,7 +374,7 @@ Needle::Needle(float x, float y) {
 void Needle::draw(glm::mat4 VP) {
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate (this->position);    // glTranslatef
-    glm::mat4 rotate    = glm::rotate((float) ((180+this->rotation) * M_PI / 180.0f), glm::vec3(0, 0, 1));
+    glm::mat4 rotate    = glm::rotate((float) ((180-this->rotation) * M_PI / 180.0f), glm::vec3(0, 0, 1));
 
     Matrices.model *= (translate * rotate);
     glm::mat4 MVP = VP * Matrices.model;

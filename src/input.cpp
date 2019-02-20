@@ -89,24 +89,16 @@ void mouseButton(GLFWwindow *window, int button, int action, int mods) {
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-      //   // Do something
-      // if(yoffset == 1)
-      //   screen_zoom *= 1.1;
-      //
-      // else if(yoffset == -1 && yoffset>0)
-      //   screen_zoom /= 1.1;
-      //
-      // reshapeWindow(window,1000,1000);
       if(view==5){
-      if(yoffset>0 && HELI_R<35){
-        HELI_R+=1;
-        cout<<"less!"<<HELI_R<<"\n";
-      }
-      else if(yoffset<0 && HELI_R >5){
-        HELI_R-=1;
-        cout<<"more!"<<HELI_R<<"\n";
-      }
-      reset_screen();
+          if(yoffset>0 && HELI_R<35){
+            HELI_R+=1;
+            cout<<"less!"<<HELI_R<<"\n";
+          }
+          else if(yoffset<0 && HELI_R >5){
+            HELI_R-=1;
+            cout<<"more!"<<HELI_R<<"\n";
+          }
+          reset_screen();
     }
 }
 
@@ -134,23 +126,4 @@ void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* 
 
     prev_xpos = xpos;
     prev_ypos = ypos;
-    // double xpos,ypos;
-    // glfwGetCursorPos(window,&xpos,&ypos);
-    // xpos=(xpos/fbwidth)*20;
-    // ypos=(ypos/fbheight)*20;
-    // float ox=(float)xpos-prev_xpos;
-    // float oy=(float)ypos-prev_ypos;
-    // //cout<<clk;
-    // if(clk)
-    // {
-    //     *eye_x +=ox;
-    //     *eye_z +=oy;
-    //
-    //     // cout<<camx<<" "<<camy<<" "<<fbheight<<" "<<fbwidth<<"\n";
-    //     //clk=0;
-    // }
-    //
-    // prev_xpos = xpos;
-    // prev_ypos = ypos;
-
 }

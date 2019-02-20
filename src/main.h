@@ -14,9 +14,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <pthread.h>
-#include <ao/ao.h>
-#include <mpg123.h>
+// #include <pthread.h>
+// #include <ao/ao.h>
+// #include <mpg123.h>
 
 struct color_t {
     int r;
@@ -43,7 +43,7 @@ void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* 
 void error_callback(int error, const char *description);
 void quit(GLFWwindow *window);
 void reshapeWindow(GLFWwindow *window, int width, int height);
-void* play_audio(void *ptr);
+// void* play_audio(void *ptr);
 
 // Types
 struct VAO {
