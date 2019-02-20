@@ -90,5 +90,28 @@ public:
     void draw(glm::mat4 VP);
 };
 
+class Compass {
+public:
+    Compass() {}
+    Compass(float x, float y);
+    glm::vec3 position;
+    void draw(glm::mat4 VP);
+private:
+    VAO *object;
+};
+
+class Needle {
+public:
+    Needle() {}
+    Needle(float x, float y);
+    glm::vec3 position;
+    float rotation;
+    void set_dir(float rot);
+    void draw(glm::mat4 VP);
+private:
+    VAO *north;
+    VAO *south;
+};
+
 
 #endif // SCORE_H

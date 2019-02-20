@@ -2,7 +2,7 @@
 #include "main.h"
 
 Ball::Ball(float x, float y, color_t color) {
-    this->position = glm::vec3(x, y, 0);
+    this->position = glm::vec3(x, y, 1);
     this->rotation = 90;//fixing the figure lol
     this->turn = 180;
     this->banking = 0;
@@ -235,15 +235,15 @@ void Ball::up() {
   }
 
 void Ball::down() {
-  if(this->position.z>=0.5){
-      if(this->position.z-this->downfall<0.5)
-        {
-          this->position.z=0.5;
-        }
-      else{
+  // if(this->position.z>=0.5){
+  //     if(this->position.z-this->downfall<0.5)
+  //       {
+  //         this->position.z=0.5;
+  //       }
+  //     else{
          this->position.z -= this->downfall;
-        }
-  }
+        // }
+  // }
 }
 
 
@@ -277,7 +277,7 @@ void Ball::bankleft() {
     }
 }
 void Ball::forward() {
-   if(this->speed<=0.6)
+   if(this->speed<=0.8)
      this->speed+=0.01;
 }
 void Ball::backward() {

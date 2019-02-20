@@ -97,41 +97,60 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
       //   screen_zoom /= 1.1;
       //
       // reshapeWindow(window,1000,1000);
-      if(yoffset>0 && screen_zoom<3){
-        screen_zoom+=0.1;
-        // screen_center_x+=2;
-        cout<<"less!"<<screen_zoom<<"\n";
+      if(view==5){
+      if(yoffset>0 && HELI_R<35){
+        HELI_R+=1;
+        cout<<"less!"<<HELI_R<<"\n";
       }
-      else if(yoffset<0 && screen_zoom >0.1){
-        screen_zoom-=0.1;
-        // screen_center_x+=0.1;
-
-        cout<<"more!"<<screen_zoom<<"\n";
+      else if(yoffset<0 && HELI_R >5){
+        HELI_R-=1;
+        cout<<"more!"<<HELI_R<<"\n";
       }
       reset_screen();
+    }
 }
 
 float prev_xpos=0.0f,prev_ypos=0.0f;
 
-void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* eye_z)
+void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* eye_y, float* eye_z,float a, float b, float c)
 {
     double xpos,ypos;
     glfwGetCursorPos(window,&xpos,&ypos);
     xpos=(xpos/fbwidth)*20;
     ypos=(ypos/fbheight)*20;
-    float ox=(float)xpos-prev_xpos;
-    float oy=(float)ypos-prev_ypos;
+
+    float dx=(float)xpos-prev_xpos;
+    float dy=(float)ypos-prev_ypos;
     //cout<<clk;
     if(clk)
     {
-        *eye_x +=ox;
-        *eye_z +=oy;
+        HELI_THETA+= dx;
+        HELI_PHI+= dy;
 
-        // cout<<camx<<" "<<camy<<" "<<fbheight<<" "<<fbwidth<<"\n";
-        //clk=0;
+        *eye_x = a + HELI_R * cos(HELI_THETA*M_PI/180.0f) * cos(HELI_PHI*M_PI/180.0f);
+        *eye_y = b + HELI_R * sin(HELI_THETA*M_PI/180.0f) * cos(HELI_PHI*M_PI/180.0f);
+        *eye_z = c +HELI_R * sin(HELI_PHI*M_PI/180.0f);
     }
 
     prev_xpos = xpos;
     prev_ypos = ypos;
+    // double xpos,ypos;
+    // glfwGetCursorPos(window,&xpos,&ypos);
+    // xpos=(xpos/fbwidth)*20;
+    // ypos=(ypos/fbheight)*20;
+    // float ox=(float)xpos-prev_xpos;
+    // float oy=(float)ypos-prev_ypos;
+    // //cout<<clk;
+    // if(clk)
+    // {
+    //     *eye_x +=ox;
+    //     *eye_z +=oy;
+    //
+    //     // cout<<camx<<" "<<camy<<" "<<fbheight<<" "<<fbwidth<<"\n";
+    //     //clk=0;
+    // }
+    //
+    // prev_xpos = xpos;
+    // prev_ypos = ypos;
 
 }

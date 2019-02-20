@@ -3,8 +3,8 @@
 const color_t COLOR_RED = { 236, 100, 75 };
 const color_t COLOR_GREEN = { 32, 160, 0 };
 const color_t COLOR_LAWNGREEN = { 127, 255, 0 };
-const color_t COLOR_BLACK = { 52, 73, 94 };
-const color_t COLOR_BACKGROUND = { 242, 241, 239 };
+const color_t COLOR_BLACK = { 0,0,0 };
+const color_t COLOR_BACKGROUND = { 209, 252, 255 };
 const color_t COLOR_BLUE = { 0, 105, 148 };
 const color_t COLOR_BROWN = { 56, 18, 22 };
 const color_t COLOR_ORANGE = { 255, 161, 0 };

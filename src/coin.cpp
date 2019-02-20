@@ -208,41 +208,41 @@ Bullet::Bullet(float x, float y, float z, float a, float b) {
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
     static const GLfloat vertex_buffer_data[] = {
-    0.5f,0,0,
-    0,0.5f,0,
-    0,0,0.5f,
+    1.0f,0,0,
+    0,1.0f,0,
+    0,0,1.0f,
 
-    -0.5f,0,0,
-    0,0.5f,0,
-    0,0,0.5f,
+    -1.0f,0,0,
+    0,1.0f,0,
+    0,0,1.0f,
 
-    0.5f,0,0,
-    0,-0.5f,0,
-    0,0,0.5f,
+    1.0f,0,0,
+    0,-1.0f,0,
+    0,0,1.0f,
 
-    -0.5f,0,0,
-    0,-0.5f,0,
-    0,0,0.5f,
+    -1.0f,0,0,
+    0,-1.0f,0,
+    0,0,1.0f,
 
-    0.5f,0,0,
-    0,0.5f,0,
-    0,0,-0.5f,
+    1.0f,0,0,
+    0,1.0f,0,
+    0,0,-1.0f,
 
-    -0.5f,0,0,
-    0,0.5f,0,
-    0,0,-0.5f,
+    -1.0f,0,0,
+    0,1.0f,0,
+    0,0,-1.0f,
 
-    0.5f,0,0,
-    0,-0.5f,0,
-    0,0,-0.5f,
+    1.0f,0,0,
+    0,-1.0f,0,
+    0,0,-1.0f,
 
-    -0.5f,0,0,
-    0,-0.5f,0,
-    0,0,-0.5f
+    -1.0f,0,0,
+    0,-1.0f,0,
+    0,0,-1.0f
 
     };
 
-    this->object = create3DObject(GL_TRIANGLES, 8*3, vertex_buffer_data, COLOR_PINK, GL_FILL);
+    this->object = create3DObject(GL_TRIANGLES, 8*3, vertex_buffer_data, COLOR_BLACK, GL_FILL);
 }
 
 void Bullet::draw(glm::mat4 VP) {

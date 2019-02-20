@@ -254,7 +254,7 @@ void Marker::draw(glm::mat4 VP) {
 }
 
 void Marker::set_speed(float speed) {
-  this->rotation = (speed/0.6)*180;
+  this->rotation = (speed/0.8)*180;
 }
 /////////////////////
 Fuel::Fuel(float fuel) {
@@ -300,4 +300,89 @@ void Fuel::draw(glm::mat4 VP) {
 
 void Fuel::set_fuel(float fuel){
   this->fuel = fuel;
+}
+/////////////////////////////////
+
+Compass::Compass(float x, float y) {
+    this->position = glm::vec3(x, y, 0);
+    const int p = 60;
+    const int iter = 18;
+    const float r1 = 0.5;
+    const float r2 = 0.4;
+    static GLfloat vertex_buffer_data[iter*p];
+    for (int i=0;i<p;++i){
+      // face 1
+      vertex_buffer_data[iter*i]=(r1*cos(i*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+1]=(r1*sin(i*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+2]=0;
+
+      vertex_buffer_data[iter*i+3]=(r1*cos((i+1)*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+4]=(r1*sin((i+1)*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+5]=0;
+
+      vertex_buffer_data[iter*i+6]=r2*cos(i*2*M_PI/(p));
+      vertex_buffer_data[iter*i+7]=r2*sin(i*2*M_PI/(p));
+      vertex_buffer_data[iter*i+8]=0;
+
+      vertex_buffer_data[iter*i+9]=r2*cos((i+1)*2*M_PI/(p));
+      vertex_buffer_data[iter*i+10]=r2*sin((i+1)*2*M_PI/(p));
+      vertex_buffer_data[iter*i+11]=0;
+
+      vertex_buffer_data[iter*i+12]=r2*cos(i*2*M_PI/(p));
+      vertex_buffer_data[iter*i+13]=r2*sin(i*2*M_PI/(p));
+      vertex_buffer_data[iter*i+14]=0;
+
+      vertex_buffer_data[iter*i+15]=(r1*cos((i+1)*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+16]=(r1*sin((i+1)*2*M_PI/(p)));
+      vertex_buffer_data[iter*i+17]=0;
+      }
+
+
+    this->object = create3DObject(GL_TRIANGLES, (iter/3)*p, vertex_buffer_data, COLOR_GRAY, GL_LINE );
+}
+void Compass::draw(glm::mat4 VP) {
+    Matrices.model = glm::mat4(1.0f);
+    glm::mat4 translate = glm::translate (this->position);    // glTranslatef
+    Matrices.model *= (translate);
+    glm::mat4 MVP = VP * Matrices.model;
+    glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    draw3DObject(this->object);
+}
+/////////////
+Needle::Needle(float x, float y) {
+    this->position = glm::vec3(x, y, 0);
+    this->rotation = 0;
+
+    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
+    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+    static const GLfloat vertex_buffer_data[] = {
+    -0.05f,0.0f,0.0f,
+     0.05f,0.0f,0.0f,
+     0.0f,0.4f,0.0f
+   };
+
+    this->north = create3DObject(GL_TRIANGLES, 3, vertex_buffer_data, COLOR_RED, GL_FILL);
+    static const GLfloat vertex_buffer_data_b[] = {
+    -0.05f,0.0f,0.0f,
+     0.05f,0.0f,0.0f,
+     0.0f,-0.4f,0.0f
+   };
+
+    this->south = create3DObject(GL_TRIANGLES, 3, vertex_buffer_data_b, COLOR_WHITE, GL_FILL);
+}
+
+void Needle::draw(glm::mat4 VP) {
+    Matrices.model = glm::mat4(1.0f);
+    glm::mat4 translate = glm::translate (this->position);    // glTranslatef
+    glm::mat4 rotate    = glm::rotate((float) ((180+this->rotation) * M_PI / 180.0f), glm::vec3(0, 0, 1));
+
+    Matrices.model *= (translate * rotate);
+    glm::mat4 MVP = VP * Matrices.model;
+    glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    draw3DObject(this->north);
+    draw3DObject(this->south);
+}
+
+void Needle::set_dir(float rot) {
+  this->rotation = rot;
 }

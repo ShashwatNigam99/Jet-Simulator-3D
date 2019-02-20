@@ -14,6 +14,10 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <pthread.h>
+#include <ao/ao.h>
+#include <mpg123.h>
+
 struct color_t {
     int r;
     int g;
@@ -33,12 +37,13 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods);
 void keyboardChar(GLFWwindow *window, unsigned int key);
 void mouseButton(GLFWwindow *window, int button, int action, int mods);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* eye_y);
+void mouseuse(GLFWwindow *window,int fbwidth, int fbheight,float* eye_x, float* eye_y,float *eye_z,float a,float b, float c);
 
 // other_handlers.cpp
 void error_callback(int error, const char *description);
 void quit(GLFWwindow *window);
 void reshapeWindow(GLFWwindow *window, int width, int height);
+void* play_audio(void *ptr);
 
 // Types
 struct VAO {
@@ -80,14 +85,13 @@ bool detect_islands(float a,float b,float c ,float x,float y,float z);
 bool detect_fuelup(float a,float b,float c ,float x,float y,float z);
 bool detect_vicinity(float a,float b,float x,float y);
 bool detect_cannon(float a,float b,float c,float x,float y);
-
-
-
-
+bool detect_bullet(float a,float b,float c);
 
 extern float screen_zoom, screen_center_x, screen_center_y;
 extern bool clk,rclk,pause;
 extern float MAX_X,MAX_Y,MIN_X,MIN_Y,MAX_ALTITUDE;
+extern float HELI_PHI,HELI_THETA,HELI_R;
+extern int view;
 
 void reset_screen();
 

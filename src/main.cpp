@@ -29,12 +29,14 @@ vector<Missile> missiles;
 vector<Bomb> bombs;
 vector<Ring> rings;
 vector<Ring> comp_rings;
+vector<SmokeRing> smoke_rings;
 vector<Parachute> parachutes;
 vector<Fuelup> fuelups;
 vector<Volcano> volcanoes;
 vector<Land> lands;
 vector<Cannon> cannons;
 vector<Bullet> bullets;
+vector<Arrow> arrow;
 
 Score display;
 Score altitude;
@@ -42,12 +44,18 @@ Speedometer speed_frame;
 Marker marker;
 Fuel fuel_meter;
 Ring next_check;
+Compass compass;
+Needle needle;
 
-vector<Arrow> arrow;
 
 
-long long int score = 123456;
+long long int score = 0;
 float fuel = 100;
+
+float HELI_R = 20;
+float HELI_THETA = 0;
+float HELI_PHI = 0;
+
 
 float screen_zoom = 1.0, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
@@ -116,8 +124,8 @@ void view_mapper(int view, float &eyex,float &eyey,float &eyez,float &targetx,fl
     targetx = ball.position.x ;
     targety = ball.position.y ;
     targetz = ball.position.z ;
-    mouseuse(window,1000,1000,&eyex,&eyey);
-    eyez=30;
+    mouseuse(window,1000,1000,&eyex,&eyey,&eyez,targetx,targety,targetz);
+    // eyez=30;
     break;
   }
 
@@ -198,6 +206,9 @@ void draw() {
     for(int i=0;i<arrow.size();++i){
       arrow[i].draw(VP);
     }
+    for(int i=0;i<smoke_rings.size();++i){
+      smoke_rings[i].draw(VP);
+    }
 
 
     display.draw(VP_dash);
@@ -205,6 +216,9 @@ void draw() {
     speed_frame.draw(VP_dash);
     marker.draw(VP_dash);
     fuel_meter.draw(VP_dash);
+    compass.draw(VP_dash);
+    needle.draw(VP_dash);
+
 
 }
 
@@ -340,13 +354,17 @@ void tick_input(GLFWwindow *window) {
         ball.incline++;
     }
 //////////////////////////////
-    display.tick(screen_center_x-1,4.0,score);
+    display.tick(screen_center_x-0.8,4.0,score);
     altitude.tick(screen_center_x+5,4.0,ball.position.z*100);
 
 /////////////////fire missiles and bombs
     if(clk==true && view!=5 && MISSILE_TIMER<=0){
        missiles.push_back(Missile(ball.position.x,ball.position.y,ball.position.z,ball.turn,ball.incline));
        MISSILE_TIMER+=50;
+       pthread_t missile_sound;
+       cout<<"popat";
+       char missile_filename[] = "fireball_shoot.mp3";
+       pthread_create(&missile_sound,NULL,play_audio,(void*)missile_filename);
     }
     if(rclk==true && view!=5 && BOMB_TIMER<=0){
        bombs.push_back(Bomb(ball.position.x,ball.position.y,ball.position.z,ball.turn));
@@ -355,7 +373,7 @@ void tick_input(GLFWwindow *window) {
 }
 
 void tick_elements() {
-
+           score+=10;
             if(rings.size()<=0)
             arrow.erase(arrow.begin());
 
@@ -365,6 +383,11 @@ void tick_elements() {
             fuel_meter.set_fuel(fuel);
 
             ball.tick();
+            if(ball.position.z<0.1){
+              cout<<"Crashed\n";
+              exit(0);
+            }
+
             ball.banking = ball.banking % 360;
 
                 if(ball.banking<0){
@@ -372,9 +395,10 @@ void tick_elements() {
                 }
 
             marker.set_speed(ball.speed);
+            needle.set_dir(ball.turn);
 
             for(int t=0;t<parachutes.size();++t){
-              if(parachutes[t].position.z<=0)
+              if(parachutes[t].position.z<=0.5)
                    parachutes.erase(parachutes.begin()+t);
               else
                    parachutes[t].tick();
@@ -422,6 +446,7 @@ void tick_elements() {
                           cout<<"maaar sale ko\n";
                           missiles.erase(missiles.begin()+i);
                           parachutes.erase(parachutes.begin()+t);
+                          score+=1234;
                             }
                       }
 
@@ -430,6 +455,7 @@ void tick_elements() {
                           cannons[t].position.x,cannons[t].position.y)){
                             missiles.erase(missiles.begin()+i);
                             cannons.erase(cannons.begin()+t);
+                            score+=987;
                            }
                        }
                     }
@@ -452,6 +478,7 @@ void tick_elements() {
                          cannons[t].position.x,cannons[t].position.y)){
                            bombs.erase(bombs.begin()+i);
                            cannons.erase(cannons.begin()+t);
+                           score+=1500;
                           }
                       }
                   }
@@ -461,6 +488,16 @@ void tick_elements() {
               cout<<"whoah";
               comp_rings.push_back(Ring(rings[0].position.x,rings[0].position.y,rings[0].position.z,rings[0].rotation,COLOR_LAWNGREEN));
               rings.erase(rings.begin());
+              score+=2000;
+            }
+
+           for(int i=0;i<smoke_rings.size();++i){
+            if(detect_passthrough(smoke_rings[i].position.x,smoke_rings[i].position.y,smoke_rings[i].position.z)){
+              cout<<"whoah";
+              // comp_rings.push_back(Ring(rings[0].position.x,rings[0].position.y,rings[0].position.z,rings[0].rotation,COLOR_LAWNGREEN));
+              smoke_rings.erase(smoke_rings.begin()+i);
+              score+=1000;
+               }
             }
 
             for(int i=0;i<volcanoes.size();++i)
@@ -487,6 +524,7 @@ void tick_elements() {
               {
                 cout<<"OH noice";
                 fuelups.erase(fuelups.begin()+i);
+                fuel = 100;
               }
             }
             for(int i=0;i<cannons.size();++i)
@@ -494,6 +532,15 @@ void tick_elements() {
               if(detect_cannon(ball.position.x,ball.position.y,ball.position.z,cannons[i].position.x,cannons[i].position.y))
               {
                 cannons.erase(cannons.begin()+i);
+                exit(0);
+              }
+            }
+            for(int i=0;i<bullets.size();++i)
+            {
+              if(detect_bullet(bullets[i].position.x,bullets[i].position.y,bullets[i].position.z))
+              {
+                // cannons.erase(cannons.begin()+i);
+                cout<<"mar gya bc";
                 exit(0);
               }
             }
@@ -564,7 +611,7 @@ void initGL(GLFWwindow *window, int width, int height) {
 
      for(float i = -1000.0;i<1000.0; i+=250.0){
         for(float j = -1000.0;j<1000.0; j+=250.0){
-            volcanoes.push_back(Volcano(17+i+rand()%100,17+j+rand()%100, 10+rand()%7));
+            volcanoes.push_back(Volcano(23+i+rand()%100,17+j+rand()%100, 10+rand()%7));
             parachutes.push_back(Parachute(i+rand()%250, j+rand()%250, 50 + rand()% 50));
             fuelups.push_back(Fuelup(i+rand()%200, j+rand()%200, 20 + rand()% 50));
         }
@@ -573,19 +620,18 @@ void initGL(GLFWwindow *window, int width, int height) {
      for(float i = -875.0;i<1000.0; i+=250.0){
         for(float j = -875.0;j<1000.0; j+=250.0){
             lands.push_back(Land(i+rand()%100,j+rand()%100, rand()%180));
+            smoke_rings.push_back(SmokeRing(i+rand()%200,j+rand()%200,30+ rand()% 30,-30+rand()%60,COLOR_GRAY));
+
         }
      }
 
-
-     // lands.push_back(Land(-50,50,45));
-
-     // lands.push_back(Land(50,-50,125));
-
-     display = Score(screen_center_x-1,4.0,score);
+     display = Score(screen_center_x-0.5,4.0,score);
      altitude = Score(screen_center_x+5,4.0,ball.position.z*100);
      speed_frame = Speedometer(screen_center_x-3,-4.0);
      marker = Marker(screen_center_x-3,-4.0);
      fuel_meter =  Fuel(100.0);
+     compass = Compass(screen_center_x,3.5);
+     needle = Needle(screen_center_x,3.5);
 
 
     // Create and compile our GLSL program from the shaders
@@ -672,6 +718,10 @@ bool detect_vicinity(float a,float b,float x,float y){
 // a b c --plane and x y -- cannon
 bool detect_cannon(float a,float b, float c,float x,float y){
   return  ( pow(a-x,2) + pow(b-y,2) < 40 && c<10 );
+}
+
+bool detect_bullet(float x,float y,float z){
+  return  ( pow(ball.position.x-x,2) + pow(ball.position.y-y,2) + pow(ball.position.z-z,2) < 8 );
 }
 
 void reset_screen() {
