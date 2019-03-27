@@ -28,7 +28,7 @@
 -- Completed checkpoints appear in green.
 - 2) Volcanoes
 -- Above volcanoes,till a certain height the game ends ; NO FLY ZONE.
-- 3)Parachutes
+- 3) Parachutes
 --Can be shot to gain points. Do this fast as they keep falling downwards.
 - 4) Fuel ups: Increases fuel to maximum, Running out of fuel finishes game.
 - 5) Smoke Rings : Passing through which increases points
