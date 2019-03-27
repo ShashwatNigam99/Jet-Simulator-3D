@@ -2,7 +2,8 @@
 
 ## Operating the plane
 ```./run.sh```
-
+<img src = "images/1.png">
+<img src = "images/2.png">
 ## Game Controls:
 ### Camera Views:
 -  1) Plane view : ​P
@@ -37,3 +38,6 @@ tank.
 ## Special Features:
 - 1) Dashboard Compass: Functional Compass which points towards the north direction.
 - 2) Special stunts like barrel roll can be performed
+
+<img src = "images/1.png">
+<img src = "images/2.png">
