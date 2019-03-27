@@ -1,10 +1,8 @@
 # Jet Simulator : 3D OpenGL
-
-## Operating the plane
+## Running the Simulator
 ```./run.sh```
-<img src = "images/1.png">
-<img src = "images/2.png">
-## Game Controls:
+
+## Controls:
 ### Camera Views:
 -  1) Plane view : ​P
 -  2) Top View : ​T
