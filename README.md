@@ -4,22 +4,20 @@
 
 ## Controls:
 ### Camera Views:
--  Plane view (from the back) : ​P
--  Top View : ​T
--  Tower view :​ Y
--  Follow-cam view : ​F
--  Helicopter-cam view: ​H 
-  - The helicopter view lets you observe the plane with the camera on a sphere of constant radius around the jet, looking at the centre of the jet.
-  - Clicking and dragging will let you move the camera around on the sphere.
-  - Scrolling will change the radius of the sphere.
+-  Plane view (from the back) : ​`P`
+-  Top View : `T`
+-  Tower view : `Y`
+-  Follow-cam view : `F`
+-  Helicopter-cam view: `H`
+  - The helicopter view lets you observe the plane with the camera on a sphere of constant        radius around the jet, looking at the centre of the jet. Clicking and dragging will let you move the camera around on the sphere. Scrolling will change the radius of the sphere.
   
 ### Plane Controls:
-- Roll : ​A​ to roll Left and ​D​ to roll Right
-- Turn : ​Q​ / ​Left arrow​ to turn left and ​E ​/ ​Right arrow​ to turn right
-- Altitude Control : ​Space Bar​ to increase and ​S​ to decrease
-- Acceleration : ​W ​/​ Up​ arrow to increase speed and ​Down​ arrow to decrease.
-- Drop bomb : ​Right Click
-- Shoot missile : ​Left Click
+- Roll : `A` to roll Left and `D` to roll Right
+- Turn : `Q` / `Left arrow` to turn left and `E` / `Right arrow` to turn right
+- Altitude Control : `Space Bar` to increase and `S` to decrease
+- Acceleration : `W` / `Up` arrow to increase speed and `Down arrow` to decrease.
+- Drop bomb : `Right Click`
+- Shoot missile : `Left Click`
 
 ### Game Features:
 - Circular Ring Checkpoints
